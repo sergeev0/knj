@@ -4,6 +4,7 @@ import {
   moveTaskAction
 } from "@/app/actions";
 import MoveForm from "@/app/components/MoveForm";
+import ThemeToggle from "@/app/components/ThemeToggle";
 import { getBoardView } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -83,6 +84,7 @@ export default function Home() {
             Local-first Kanban for human and agent workflow steps.
           </p>
         </div>
+        <ThemeToggle />
       </header>
 
       <section className="summary" aria-label="Board summary">
