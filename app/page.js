@@ -1,11 +1,13 @@
+import Link from "next/link";
 import {
   addCommentAction,
   createTaskAction,
   moveTaskAction
 } from "@/app/actions";
+import Modal from "@/app/components/Modal";
 import MoveForm from "@/app/components/MoveForm";
-import ThemeToggle from "@/app/components/ThemeToggle";
-import { getBoardView } from "@/lib/db";
+import Topbar from "@/app/components/Topbar";
+import { getBoardView, getTaskDetail } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -22,33 +24,19 @@ function formatTime(value) {
   }).format(new Date(value));
 }
 
-function TaskCard({ task, columns }) {
+function TaskCard({ task }) {
   return (
-    <article className="task">
+    <Link className="task compact-task" href={`/?task=${task.identifier}`}>
       <div className="task-title">
         <span className="muted">{task.identifier}</span>
         <strong>{task.title}</strong>
       </div>
-      {task.body ? <p className="task-body">{task.body}</p> : null}
-      <p className="muted">
-        Assigned to {task.assigneeName || "unassigned"}
-      </p>
-      <div className="task-actions">
-        <MoveForm action={moveTaskAction} task={task} columns={columns} />
-        <form action={addCommentAction}>
-          <input type="hidden" name="taskId" value={task.id} />
-          <label>
-            Comment
-            <textarea name="body" placeholder="Add context or a handoff note" />
-          </label>
-          <button type="submit">Add comment</button>
-        </form>
-      </div>
-    </article>
+      <p className="muted">{task.assigneeName || "Unassigned"}</p>
+    </Link>
   );
 }
 
-function Column({ column, columns }) {
+function Column({ column }) {
   return (
     <section className="column">
       <div className="column-header">
@@ -62,120 +50,174 @@ function Column({ column, columns }) {
       </div>
       <div className="tasks">
         {column.tasks.map((task) => (
-          <TaskCard key={task.id} task={task} columns={columns} />
+          <TaskCard key={task.id} task={task} />
         ))}
       </div>
     </section>
   );
 }
 
-export default function Home() {
-  const view = getBoardView();
-  const latestRuns = view.agentRuns.slice(0, 5);
-  const latestHistory = view.flowHistory.slice(0, 6);
+function CreateTaskModal({ users }) {
+  return (
+    <Modal title="Create task" eyebrow="New work item">
+      <form action={createTaskAction} className="form-grid">
+        <label>
+          Title
+          <input name="title" required placeholder="Write the task title" />
+        </label>
+        <label>
+          Description
+          <textarea
+            name="body"
+            placeholder="Describe the problem, context, and desired outcome"
+          />
+        </label>
+        <label>
+          Assignee
+          <select name="assigneeUserId" defaultValue="">
+            <option value="">Unassigned</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.displayName}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit">Create task</button>
+      </form>
+    </Modal>
+  );
+}
+
+function TaskDetailModal({ task, columns }) {
+  if (!task) {
+    return (
+      <Modal title="Task not found" eyebrow="Missing task">
+        <p className="muted">The requested task does not exist on this board.</p>
+      </Modal>
+    );
+  }
 
   return (
-    <main className="shell">
-      <header className="topbar">
+    <Modal title={task.title} eyebrow={task.identifier}>
+      <div className="modal-content">
+        <section className="detail-grid">
+          <div>
+            <span className="detail-label">Column</span>
+            <strong>{task.currentColumnName}</strong>
+          </div>
+          <div>
+            <span className="detail-label">Assignee</span>
+            <strong>{task.assigneeName || "Unassigned"}</strong>
+          </div>
+          <div>
+            <span className="detail-label">Updated</span>
+            <strong>{formatTime(task.updatedAt)}</strong>
+          </div>
+        </section>
+
+        <section className="detail-section">
+          <h3>Description</h3>
+          <p className="task-body">{task.body || "No description yet."}</p>
+        </section>
+
+        <section className="detail-section">
+          <h3>Move task</h3>
+          <MoveForm action={moveTaskAction} task={task} columns={columns} />
+        </section>
+
+        <section className="detail-section">
+          <h3>Comments</h3>
+          <div className="comment-list">
+            {task.comments.length ? (
+              task.comments.map((comment) => (
+                <article className="comment" key={comment.id}>
+                  <strong>
+                    {comment.authorName || comment.authorType} ·{" "}
+                    {formatTime(comment.createdAt)}
+                  </strong>
+                  <p>{comment.body}</p>
+                </article>
+              ))
+            ) : (
+              <p className="muted">No comments yet.</p>
+            )}
+          </div>
+          <form action={addCommentAction} className="form-grid">
+            <input type="hidden" name="taskId" value={task.id} />
+            <label>
+              Add comment
+              <textarea name="body" placeholder="Add context or a handoff note" />
+            </label>
+            <button type="submit">Add comment</button>
+          </form>
+        </section>
+
+        <section className="detail-section">
+          <h3>Agent runs</h3>
+          <div className="run-list">
+            {task.agentRuns.length ? (
+              task.agentRuns.map((run) => (
+                <div className="run" key={run.id}>
+                  <strong>{run.columnName}</strong>
+                  <span className={`status ${run.status}`}>{run.status}</span>
+                  <p className="muted">{run.resultSummary || run.failureMessage}</p>
+                </div>
+              ))
+            ) : (
+              <p className="muted">No agent runs for this task yet.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="detail-section">
+          <h3>Flow history</h3>
+          <div className="history-list">
+            {task.flowHistory.map((item) => (
+              <div className="history-item" key={item.id}>
+                <strong>{item.columnName}</strong>
+                <p className="muted">
+                  {formatTime(item.enteredAt)} {"->"} {formatTime(item.exitedAt)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </Modal>
+  );
+}
+
+export default async function Home({ searchParams }) {
+  const params = await searchParams;
+  const view = getBoardView();
+  const selectedTask = params?.task ? getTaskDetail(params.task) : null;
+  const showCreateTask = params?.create === "task";
+
+  return (
+    <main className="shell board-shell">
+      <Topbar active="board" />
+
+      <section className="page-heading board-heading">
         <div>
-          <p className="eyebrow">KNJ is Not Jira</p>
+          <p className="eyebrow">Board</p>
           <h1>{view.board.name}</h1>
           <p className="muted">
-            Local-first Kanban for human and agent workflow steps.
+            Work moves through human steps, managed queues, and agent steps.
           </p>
         </div>
-        <ThemeToggle />
-      </header>
-
-      <section className="summary" aria-label="Board summary">
-        <div className="metric">
-          <span className="muted">Tasks</span>
-          <strong>{view.metrics.taskCount}</strong>
-        </div>
-        <div className="metric">
-          <span className="muted">Processing columns</span>
-          <strong>{view.metrics.processingColumnCount}</strong>
-        </div>
-        <div className="metric">
-          <span className="muted">Managed queues</span>
-          <strong>{view.metrics.queueCount}</strong>
-        </div>
-        <div className="metric">
-          <span className="muted">Agent runs</span>
-          <strong>{view.metrics.agentRunCount}</strong>
-        </div>
       </section>
 
-      <section className="main-grid">
-        <div className="board" aria-label="Kanban board">
-          {view.columns.map((column) => (
-            <Column key={column.id} column={column} columns={view.columns} />
-          ))}
-        </div>
-
-        <aside className="side">
-          <section className="panel">
-            <h2>Create task</h2>
-            <form action={createTaskAction} className="form-grid">
-              <label>
-                Title
-                <input name="title" required placeholder="Write the task title" />
-              </label>
-              <label>
-                Description
-                <textarea
-                  name="body"
-                  placeholder="Describe the problem, context, and desired outcome"
-                />
-              </label>
-              <label>
-                Assignee
-                <select name="assigneeUserId" defaultValue="">
-                  <option value="">Unassigned</option>
-                  {view.users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.displayName}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button type="submit">Create task</button>
-            </form>
-          </section>
-
-          <section className="panel">
-            <h2>Latest agent runs</h2>
-            <div className="run-list">
-              {latestRuns.length ? (
-                latestRuns.map((run) => (
-                  <div className="run" key={run.id}>
-                    <strong>{run.taskIdentifier} in {run.columnName}</strong>
-                    <span className={`status ${run.status}`}>{run.status}</span>
-                    <p className="muted">{run.resultSummary || run.failureMessage}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="muted">Move a task into an agent column to create a run.</p>
-              )}
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Recent flow history</h2>
-            <div className="history-list">
-              {latestHistory.map((item) => (
-                <div className="history-item" key={item.id}>
-                  <strong>{item.taskIdentifier}</strong>
-                  <span>{item.columnName}</span>
-                  <p className="muted">
-                    {formatTime(item.enteredAt)} {"->"} {formatTime(item.exitedAt)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        </aside>
+      <section className="board" aria-label="Kanban board">
+        {view.columns.map((column) => (
+          <Column key={column.id} column={column} />
+        ))}
       </section>
+
+      {showCreateTask ? <CreateTaskModal users={view.users} /> : null}
+      {params?.task ? (
+        <TaskDetailModal task={selectedTask} columns={view.columns} />
+      ) : null}
     </main>
   );
 }

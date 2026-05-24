@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   addComment,
   createTask,
@@ -24,6 +25,7 @@ export async function createTaskAction(formData) {
   });
 
   revalidatePath("/");
+  redirect("/");
 }
 
 export async function moveTaskAction(formData) {
@@ -62,4 +64,3 @@ export async function addCommentAction(formData) {
 
   revalidatePath("/");
 }
-
