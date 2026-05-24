@@ -219,6 +219,12 @@ export default async function Home({ searchParams }) {
 
       <section className="board-toolbar">
         <BoardSwitcher boards={boards} selectedBoardId={view.board.id} />
+        <Link
+          className="button secondary"
+          href={`/?board=${encodeURIComponent(view.board.id)}&create=task`}
+        >
+          New task
+        </Link>
       </section>
 
       <section className="board" aria-label="Kanban board">

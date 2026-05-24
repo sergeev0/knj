@@ -8,9 +8,6 @@ function withBoard(path, boardId) {
 export default function Topbar({ active = "board", boardId }) {
   const boardHref = withBoard("/", boardId);
   const statsHref = withBoard("/stats", boardId);
-  const createHref = boardId
-    ? `/?board=${encodeURIComponent(boardId)}&create=task`
-    : "/?create=task";
 
   return (
     <header className="topbar">
@@ -32,9 +29,6 @@ export default function Topbar({ active = "board", boardId }) {
       </nav>
 
       <div className="topbar-actions">
-        <Link className="button secondary" href={createHref}>
-          New task
-        </Link>
         <ThemeToggle />
       </div>
     </header>

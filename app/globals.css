@@ -81,6 +81,18 @@ button,
   padding: 7px 11px;
 }
 
+.sr-only {
+  clip: rect(0 0 0 0);
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 button:hover,
 .button:hover {
   background: var(--accent-dark);
@@ -114,7 +126,11 @@ textarea {
   background: var(--panel);
   border-color: var(--line-strong);
   color: var(--ink);
-  min-width: 118px;
+  height: 30px;
+  min-height: 30px;
+  min-width: 0;
+  padding: 0;
+  width: 30px;
 }
 
 .theme-toggle:hover {
@@ -126,9 +142,9 @@ textarea {
   border: 2px solid currentColor;
   border-radius: 999px;
   display: inline-block;
-  height: 14px;
+  height: 13px;
   position: relative;
-  width: 14px;
+  width: 13px;
 }
 
 .theme-icon::after {
@@ -145,17 +161,6 @@ textarea {
   inset: -3px 2px 1px -1px;
 }
 
-.theme-source {
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
-  padding: 3px 5px;
-  text-transform: uppercase;
-}
-
 textarea {
   min-height: 88px;
   resize: vertical;
@@ -170,10 +175,15 @@ label {
 }
 
 .shell {
+  align-content: start;
   display: grid;
   gap: 16px;
   min-height: 100vh;
   padding: 0 16px 24px;
+}
+
+.board-shell {
+  gap: 10px;
 }
 
 .topbar {
@@ -188,9 +198,9 @@ label {
   gap: 18px;
   justify-content: space-between;
   margin: 0 -16px;
-  min-height: 52px;
+  min-height: 48px;
   overflow-x: auto;
-  padding: 8px 16px;
+  padding: 6px 16px;
   position: sticky;
   top: 0;
   z-index: 15;
@@ -200,7 +210,7 @@ label {
   align-items: center;
   display: inline-flex;
   gap: 10px;
-  min-width: 160px;
+  min-width: 150px;
 }
 
 .brand-mark {
@@ -210,9 +220,9 @@ label {
   color: #fff;
   display: inline-flex;
   font-weight: 850;
-  height: 34px;
+  height: 30px;
   justify-content: center;
-  width: 34px;
+  width: 30px;
 }
 
 .brand strong,
@@ -243,7 +253,7 @@ label {
   color: var(--muted);
   font-weight: 750;
   min-width: 82px;
-  padding: 15px 12px 13px;
+  padding: 13px 12px 11px;
   text-align: center;
 }
 
@@ -260,7 +270,7 @@ label {
   display: inline-flex;
   gap: 8px;
   justify-content: flex-end;
-  min-width: 230px;
+  min-width: 34px;
 }
 
 .page-heading {
@@ -273,25 +283,41 @@ label {
 .stats-toolbar {
   align-items: center;
   display: flex;
-  justify-content: space-between;
-  padding-top: 2px;
+  gap: 12px;
+  justify-content: flex-start;
+  padding-top: 0;
 }
 
 .board-switcher {
   align-items: center;
   display: inline-flex;
-  gap: 9px;
-}
-
-.board-switcher span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
+  min-width: 0;
 }
 
 .board-switcher select {
-  min-width: 260px;
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%) right 12px
+      center / 7px 7px no-repeat,
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%) right 7px
+      center / 7px 7px no-repeat;
+  border-color: transparent;
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 30px;
+  font-weight: 850;
+  line-height: 1.05;
+  min-height: 40px;
+  min-width: 0;
+  padding: 2px 28px 4px 0;
+  width: fit-content;
+}
+
+.board-switcher select:hover,
+.board-switcher select:focus {
+  background-color: var(--panel-soft);
+  border-color: transparent;
+  outline: none;
 }
 
 .compact-heading {
@@ -655,13 +681,12 @@ h3 {
     display: none;
   }
 
-  .board-switcher {
-    align-items: stretch;
-    display: grid;
-    width: 100%;
+  .board-toolbar {
+    flex-wrap: wrap;
   }
 
   .board-switcher select {
-    min-width: 0;
+    font-size: 30px;
+    max-width: calc(100vw - 150px);
   }
 }

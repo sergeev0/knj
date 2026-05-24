@@ -82,13 +82,11 @@ export default function ThemeToggle() {
       type="button"
       className="theme-toggle"
       aria-pressed={theme === "dark"}
+      aria-label={`Switch to ${nextTheme} theme`}
       title={`Switch to ${nextTheme} theme`}
       onClick={toggleTheme}
     >
       <span className="theme-icon" aria-hidden="true" />
-      <span>{theme === "dark" ? "Dark" : "Light"}</span>
-      {!hasStoredPreference ? <span className="theme-source">auto</span> : null}
     </button>
   );
 }
-

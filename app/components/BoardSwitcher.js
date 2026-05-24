@@ -18,7 +18,7 @@ export default function BoardSwitcher({ boards, selectedBoardId }) {
 
   return (
     <label className="board-switcher">
-      <span>Board</span>
+      <span className="sr-only">Board</span>
       <select value={selectedBoardId} onChange={changeBoard}>
         {boards.map((board) => (
           <option key={board.id} value={board.id}>
@@ -29,4 +29,3 @@ export default function BoardSwitcher({ boards, selectedBoardId }) {
     </label>
   );
 }
-
