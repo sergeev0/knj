@@ -165,6 +165,7 @@ export async function updateProcessingColumnAction(formData) {
 
 export async function updateAgentProfileAction(formData) {
   const processingColumnId = String(formData.get("processingColumnId") || "").trim();
+  const harness = String(formData.get("harness") || "codex-cli").trim();
   const model = String(formData.get("model") || "").trim();
   const prompt = String(formData.get("prompt") || "").trim();
   const allowedTools = String(formData.get("allowedTools") || "").trim();
@@ -179,6 +180,7 @@ export async function updateAgentProfileAction(formData) {
 
   updateAgentProfile({
     processingColumnId,
+    harness,
     model,
     prompt,
     allowedTools,

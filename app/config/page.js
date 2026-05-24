@@ -98,9 +98,19 @@ function AgentProfileForm({ column }) {
       <input type="hidden" name="processingColumnId" value={column.id} />
       <div className="form-row">
         <label>
+          Harness
+          <input name="harness" defaultValue={profile.harness || "codex-cli"} required />
+        </label>
+        <label>
           Model
           <input name="model" defaultValue={profile.model || "gpt-5"} required />
         </label>
+      </div>
+      <label>
+        Config file
+        <input value={profile.sourcePath || ""} readOnly />
+      </label>
+      <div className="form-row">
         <label>
           Working directory
           <input name="workingDirectory" defaultValue={profile.workingDirectory || ""} />

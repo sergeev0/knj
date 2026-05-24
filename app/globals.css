@@ -532,6 +532,30 @@ h3 {
   gap: 10px;
 }
 
+.column-title-row {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.square-icon-button {
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 13px;
+  height: 26px;
+  justify-content: center;
+  line-height: 1;
+  width: 26px;
+}
+
+.square-icon-button:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
 .badge {
   border: 1px solid var(--line-strong);
   border-radius: 999px;
@@ -716,6 +740,16 @@ h3 {
 .comment p {
   color: var(--muted);
   line-height: 1.45;
+}
+
+.file-path {
+  background: var(--field-bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 8px;
 }
 
 .panel {

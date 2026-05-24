@@ -2,13 +2,19 @@ import Link from "next/link";
 import {
   addCommentAction,
   createTaskAction,
-  moveTaskAction
+  moveTaskAction,
+  updateAgentProfileAction
 } from "@/app/actions";
 import BoardSwitcher from "@/app/components/BoardSwitcher";
 import Modal from "@/app/components/Modal";
 import MoveForm from "@/app/components/MoveForm";
 import Topbar from "@/app/components/Topbar";
-import { getBoards, getBoardView, getTaskDetail } from "@/lib/db";
+import {
+  getAgentColumnConfig,
+  getBoards,
+  getBoardView,
+  getTaskDetail
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -41,11 +47,27 @@ function TaskCard({ task, boardId }) {
 }
 
 function Column({ column }) {
+  const agentConfigHref = `/?board=${encodeURIComponent(
+    column.boardId
+  )}&agentColumn=${encodeURIComponent(column.id)}`;
+
   return (
     <section className="column">
       <div className="column-header">
         <div>
-          <h2>{column.name}</h2>
+          <div className="column-title-row">
+            <h2>{column.name}</h2>
+            {column.kind === "agent" ? (
+              <Link
+                className="square-icon-button"
+                href={agentConfigHref}
+                aria-label={`Configure ${column.name} agent column`}
+                title={`Configure ${column.name}`}
+              >
+                <span aria-hidden="true">⚙</span>
+              </Link>
+            ) : null}
+          </div>
           <p className="muted">{column.tasks.length} tasks</p>
         </div>
         <span className={`badge ${column.kind || column.type}`}>
@@ -58,6 +80,94 @@ function Column({ column }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function AgentColumnConfigModal({ config, boardId }) {
+  if (!config) {
+    return (
+      <Modal
+        title="Agent column not found"
+        eyebrow="Configuration"
+        closeHref={`/?board=${encodeURIComponent(boardId)}`}
+      >
+        <p className="muted">The requested agent column does not exist on this board.</p>
+      </Modal>
+    );
+  }
+
+  const profile = config.profile;
+
+  return (
+    <Modal
+      title={`${config.name} agent config`}
+      eyebrow={config.boardName}
+      closeHref={`/?board=${encodeURIComponent(boardId)}`}
+    >
+      <form action={updateAgentProfileAction} className="modal-content">
+        <input type="hidden" name="processingColumnId" value={config.id} />
+        <section className="detail-section">
+          <h3>Harness</h3>
+          <div className="form-row">
+            <label>
+              Harness command
+              <input name="harness" defaultValue={profile.harness} required />
+            </label>
+            <label>
+              Model
+              <input name="model" defaultValue={profile.model} required />
+            </label>
+          </div>
+          <label>
+            Working directory
+            <input name="workingDirectory" defaultValue={profile.workingDirectory || ""} />
+          </label>
+        </section>
+
+        <section className="detail-section">
+          <h3>Instructions</h3>
+          <label>
+            Prompt passed to the harness
+            <textarea name="prompt" defaultValue={profile.prompt} required />
+          </label>
+          <label>
+            Completion criteria
+            <textarea
+              name="completionCriteria"
+              defaultValue={profile.completionCriteria}
+            />
+          </label>
+        </section>
+
+        <section className="detail-section">
+          <h3>Task context</h3>
+          <div className="form-row">
+            <label>
+              Allowed tools
+              <textarea name="allowedTools" defaultValue={profile.allowedTools} />
+            </label>
+            <label>
+              Context rules
+              <textarea name="contextRules" defaultValue={profile.contextRules} />
+            </label>
+          </div>
+          <label>
+            Environment
+            <textarea name="environment" defaultValue={profile.environment} />
+          </label>
+        </section>
+
+        <section className="detail-section">
+          <h3>Markdown source</h3>
+          <p className="muted">
+            This agent profile is also stored as an editable markdown file.
+          </p>
+          <code className="file-path">{config.sourcePath}</code>
+        </section>
+
+        <button type="submit">Save agent config</button>
+      </form>
+    </Modal>
   );
 }
 
@@ -211,6 +321,9 @@ export default async function Home({ searchParams }) {
   const requestedBoardId = params?.board || null;
   const view = getBoardView(requestedBoardId);
   const selectedTask = params?.task ? getTaskDetail(params.task, view.board.id) : null;
+  const selectedAgentColumn = params?.agentColumn
+    ? getAgentColumnConfig(params.agentColumn, view.board.id)
+    : null;
   const showCreateTask = params?.create === "task";
 
   return (
@@ -240,6 +353,12 @@ export default async function Home({ searchParams }) {
         <TaskDetailModal
           task={selectedTask}
           columns={view.columns}
+          boardId={view.board.id}
+        />
+      ) : null}
+      {params?.agentColumn ? (
+        <AgentColumnConfigModal
+          config={selectedAgentColumn}
           boardId={view.board.id}
         />
       ) : null}
