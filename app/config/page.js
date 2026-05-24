@@ -169,18 +169,18 @@ function BoardConfiguration({ board }) {
   );
 }
 
-export default function BoardsPage() {
+export default function ConfigPage() {
   const boards = getBoardSettings();
   const firstBoardId = boards[0]?.id;
 
   return (
     <main className="shell">
-      <Topbar active="boards" boardId={firstBoardId} />
+      <Topbar active="config" boardId={firstBoardId} />
 
       <section className="page-heading compact-heading">
         <div>
           <p className="eyebrow">Administration</p>
-          <h1>Boards</h1>
+          <h1>Config</h1>
           <p className="muted">
             Create workflows and configure human or agent-owned processing columns.
           </p>

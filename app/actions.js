@@ -88,9 +88,9 @@ export async function createBoardAction(formData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/boards");
+  revalidatePath("/config");
   revalidatePath("/stats");
-  redirect(`/boards?board=${encodeURIComponent(boardId)}`);
+  redirect(`/config?board=${encodeURIComponent(boardId)}`);
 }
 
 export async function updateBoardAction(formData) {
@@ -111,7 +111,7 @@ export async function updateBoardAction(formData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/boards");
+  revalidatePath("/config");
   revalidatePath("/stats");
 }
 
@@ -135,7 +135,7 @@ export async function addProcessingColumnAction(formData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/boards");
+  revalidatePath("/config");
   revalidatePath("/stats");
 }
 
@@ -159,7 +159,7 @@ export async function updateProcessingColumnAction(formData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/boards");
+  revalidatePath("/config");
   revalidatePath("/stats");
 }
 
@@ -189,6 +189,6 @@ export async function updateAgentProfileAction(formData) {
   });
 
   revalidatePath("/");
-  revalidatePath("/boards");
+  revalidatePath("/config");
   revalidatePath("/stats");
 }
