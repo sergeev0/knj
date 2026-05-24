@@ -1,10 +1,20 @@
 import Link from "next/link";
 import ThemeToggle from "@/app/components/ThemeToggle";
 
-export default function Topbar({ active = "board" }) {
+function withBoard(path, boardId) {
+  return boardId ? `${path}?board=${encodeURIComponent(boardId)}` : path;
+}
+
+export default function Topbar({ active = "board", boardId }) {
+  const boardHref = withBoard("/", boardId);
+  const statsHref = withBoard("/stats", boardId);
+  const createHref = boardId
+    ? `/?board=${encodeURIComponent(boardId)}&create=task`
+    : "/?create=task";
+
   return (
     <header className="topbar">
-      <Link className="brand" href="/">
+      <Link className="brand" href={boardHref}>
         <span className="brand-mark">K</span>
         <span>
           <strong>KNJ</strong>
@@ -13,16 +23,16 @@ export default function Topbar({ active = "board" }) {
       </Link>
 
       <nav className="topnav" aria-label="Primary navigation">
-        <Link className={active === "board" ? "active" : ""} href="/">
+        <Link className={active === "board" ? "active" : ""} href={boardHref}>
           Board
         </Link>
-        <Link className={active === "stats" ? "active" : ""} href="/stats">
+        <Link className={active === "stats" ? "active" : ""} href={statsHref}>
           Stats
         </Link>
       </nav>
 
       <div className="topbar-actions">
-        <Link className="button secondary" href="/?create=task">
+        <Link className="button secondary" href={createHref}>
           New task
         </Link>
         <ThemeToggle />
@@ -30,4 +40,3 @@ export default function Topbar({ active = "board" }) {
     </header>
   );
 }
-

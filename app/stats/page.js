@@ -1,5 +1,6 @@
+import BoardSwitcher from "@/app/components/BoardSwitcher";
 import Topbar from "@/app/components/Topbar";
-import { getBoardView } from "@/lib/db";
+import { getBoards, getBoardView } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -16,16 +17,22 @@ function formatTime(value) {
   }).format(new Date(value));
 }
 
-export default function StatsPage() {
-  const view = getBoardView();
+export default async function StatsPage({ searchParams }) {
+  const params = await searchParams;
+  const boards = getBoards();
+  const view = getBoardView(params?.board || null);
   const latestRuns = view.agentRuns.slice(0, 8);
   const latestHistory = view.flowHistory.slice(0, 12);
 
   return (
     <main className="shell">
-      <Topbar active="stats" />
+      <Topbar active="stats" boardId={view.board.id} />
 
-      <section className="page-heading">
+      <section className="stats-toolbar">
+        <BoardSwitcher boards={boards} selectedBoardId={view.board.id} />
+      </section>
+
+      <section className="page-heading compact-heading">
         <div>
           <p className="eyebrow">Board analytics</p>
           <h1>{view.board.name} stats</h1>
@@ -92,4 +99,3 @@ export default function StatsPage() {
     </main>
   );
 }
-

@@ -10,6 +10,7 @@ import {
 } from "@/lib/db";
 
 export async function createTaskAction(formData) {
+  const boardId = String(formData.get("boardId") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const body = String(formData.get("body") || "").trim();
   const assigneeUserId = String(formData.get("assigneeUserId") || "").trim();
@@ -19,13 +20,14 @@ export async function createTaskAction(formData) {
   }
 
   createTask({
+    boardId: boardId || null,
     title,
     body,
     assigneeUserId: assigneeUserId || null
   });
 
   revalidatePath("/");
-  redirect("/");
+  redirect(boardId ? `/?board=${encodeURIComponent(boardId)}` : "/");
 }
 
 export async function moveTaskAction(formData) {

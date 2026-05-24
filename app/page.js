@@ -4,10 +4,11 @@ import {
   createTaskAction,
   moveTaskAction
 } from "@/app/actions";
+import BoardSwitcher from "@/app/components/BoardSwitcher";
 import Modal from "@/app/components/Modal";
 import MoveForm from "@/app/components/MoveForm";
 import Topbar from "@/app/components/Topbar";
-import { getBoardView, getTaskDetail } from "@/lib/db";
+import { getBoards, getBoardView, getTaskDetail } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +25,12 @@ function formatTime(value) {
   }).format(new Date(value));
 }
 
-function TaskCard({ task }) {
+function TaskCard({ task, boardId }) {
   return (
-    <Link className="task compact-task" href={`/?task=${task.identifier}`}>
+    <Link
+      className="task compact-task"
+      href={`/?board=${encodeURIComponent(boardId)}&task=${task.identifier}`}
+    >
       <div className="task-title">
         <span className="muted">{task.identifier}</span>
         <strong>{task.title}</strong>
@@ -50,17 +54,22 @@ function Column({ column }) {
       </div>
       <div className="tasks">
         {column.tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} boardId={column.boardId} />
         ))}
       </div>
     </section>
   );
 }
 
-function CreateTaskModal({ users }) {
+function CreateTaskModal({ users, boardId }) {
   return (
-    <Modal title="Create task" eyebrow="New work item">
+    <Modal
+      title="Create task"
+      eyebrow="New work item"
+      closeHref={`/?board=${encodeURIComponent(boardId)}`}
+    >
       <form action={createTaskAction} className="form-grid">
+        <input type="hidden" name="boardId" value={boardId} />
         <label>
           Title
           <input name="title" required placeholder="Write the task title" />
@@ -89,17 +98,25 @@ function CreateTaskModal({ users }) {
   );
 }
 
-function TaskDetailModal({ task, columns }) {
+function TaskDetailModal({ task, columns, boardId }) {
   if (!task) {
     return (
-      <Modal title="Task not found" eyebrow="Missing task">
+      <Modal
+        title="Task not found"
+        eyebrow="Missing task"
+        closeHref={`/?board=${encodeURIComponent(boardId)}`}
+      >
         <p className="muted">The requested task does not exist on this board.</p>
       </Modal>
     );
   }
 
   return (
-    <Modal title={task.title} eyebrow={task.identifier}>
+    <Modal
+      title={task.title}
+      eyebrow={task.identifier}
+      closeHref={`/?board=${encodeURIComponent(boardId)}`}
+    >
       <div className="modal-content">
         <section className="detail-grid">
           <div>
@@ -190,33 +207,35 @@ function TaskDetailModal({ task, columns }) {
 
 export default async function Home({ searchParams }) {
   const params = await searchParams;
-  const view = getBoardView();
-  const selectedTask = params?.task ? getTaskDetail(params.task) : null;
+  const boards = getBoards();
+  const requestedBoardId = params?.board || null;
+  const view = getBoardView(requestedBoardId);
+  const selectedTask = params?.task ? getTaskDetail(params.task, view.board.id) : null;
   const showCreateTask = params?.create === "task";
 
   return (
     <main className="shell board-shell">
-      <Topbar active="board" />
+      <Topbar active="board" boardId={view.board.id} />
 
-      <section className="page-heading board-heading">
-        <div>
-          <p className="eyebrow">Board</p>
-          <h1>{view.board.name}</h1>
-          <p className="muted">
-            Work moves through human steps, managed queues, and agent steps.
-          </p>
-        </div>
+      <section className="board-toolbar">
+        <BoardSwitcher boards={boards} selectedBoardId={view.board.id} />
       </section>
 
       <section className="board" aria-label="Kanban board">
         {view.columns.map((column) => (
-          <Column key={column.id} column={column} />
+          <Column key={column.id} column={{ ...column, boardId: view.board.id }} />
         ))}
       </section>
 
-      {showCreateTask ? <CreateTaskModal users={view.users} /> : null}
+      {showCreateTask ? (
+        <CreateTaskModal users={view.users} boardId={view.board.id} />
+      ) : null}
       {params?.task ? (
-        <TaskDetailModal task={selectedTask} columns={view.columns} />
+        <TaskDetailModal
+          task={selectedTask}
+          columns={view.columns}
+          boardId={view.board.id}
+        />
       ) : null}
     </main>
   );
