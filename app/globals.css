@@ -435,6 +435,71 @@ h3 {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.7fr);
 }
 
+.admin-grid {
+  align-items: start;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+.admin-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-board {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.admin-board-header,
+.section-title {
+  align-items: start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.config-section,
+.config-list {
+  display: grid;
+  gap: 10px;
+}
+
+.config-item {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.inline-form {
+  align-items: end;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(160px, 1fr) 120px 80px 80px auto;
+}
+
+.form-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.agent-config {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+}
+
 .board {
   align-items: stretch;
   background: var(--panel);
@@ -709,6 +774,9 @@ h3 {
   .main-grid,
   .summary,
   .stats-grid,
+  .admin-grid,
+  .inline-form,
+  .form-row,
   .detail-grid {
     grid-template-columns: 1fr;
   }

@@ -8,6 +8,7 @@ function withBoard(path, boardId) {
 export default function Topbar({ active = "board", boardId }) {
   const boardHref = withBoard("/", boardId);
   const statsHref = withBoard("/stats", boardId);
+  const boardsHref = withBoard("/boards", boardId);
 
   return (
     <header className="topbar">
@@ -25,6 +26,9 @@ export default function Topbar({ active = "board", boardId }) {
         </Link>
         <Link className={active === "stats" ? "active" : ""} href={statsHref}>
           Stats
+        </Link>
+        <Link className={active === "boards" ? "active" : ""} href={boardsHref}>
+          Boards
         </Link>
       </nav>
 
