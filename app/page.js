@@ -46,6 +46,10 @@ function TaskCard({ task, boardId }) {
   );
 }
 
+function taskCountLabel(count) {
+  return `${count} ${count === 1 ? "task" : "tasks"}`;
+}
+
 function Column({ column }) {
   const agentConfigHref = `/?board=${encodeURIComponent(
     column.boardId
@@ -68,7 +72,7 @@ function Column({ column }) {
               </Link>
             ) : null}
           </div>
-          <p className="muted">{column.tasks.length} tasks</p>
+          <p className="muted">{taskCountLabel(column.tasks.length)}</p>
         </div>
         <span className={`badge ${column.kind || column.type}`}>
           {column.kind || column.type}

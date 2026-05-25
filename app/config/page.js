@@ -10,6 +10,10 @@ import { getBoardSettings } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+function taskCountLabel(count) {
+  return `${count} ${count === 1 ? "task" : "tasks"}`;
+}
+
 function BoardForm({ board }) {
   return (
     <form action={updateBoardAction} className="form-grid">
@@ -155,7 +159,7 @@ function BoardConfiguration({ board }) {
         <div>
           <h2>{board.name}</h2>
           <p className="muted">
-            {board.taskCount} tasks · next key {board.identifierPrefix}-
+            {taskCountLabel(board.taskCount)} · next key {board.identifierPrefix}-
             {board.nextTaskNumber}
           </p>
         </div>
